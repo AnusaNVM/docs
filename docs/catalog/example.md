@@ -26,20 +26,17 @@ export const gatewayAddress =
   process.env.REACT_APP_GATEWAY_ADDRESS || '0x5838B5512cF9f12FE9f2beccB20eb47211F9B0bc'
 export const gatewayUri =
   process.env.REACT_APP_GATEWAY_URI || 'https://gateway.mumbai.public.nevermined.network'
-export const faucetUri =
-  process.env.REACT_APP_FAUCET_URI || 'https://faucet.rinkeby.nevermined.rocks'
 export const acceptedChainId = process.env.REACT_APP_ACCEPTED_CHAIN_ID || '80001' // for Mumbai
 export const rootUri = process.env.REACT_APP_ROOT_URI || 'http://localhost:3445'
 export const marketplaceUri = 'https://marketplace-api.mumbai.public.nevermined.network'
 const graphHttpUri = process.env.GRAPH_HTTP_URI ||  'https://api.thegraph.com/subgraphs/name/nevermined-io/public'
-export const erc20TokenAddress = process.env.ERC20_TOKEN_ADDRESS || '0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e'
+// represent USDC token in mumbai that can be claimed in the faucet https://calibration-faucet.filswan.com/#/dashboard
+export const erc20TokenAddress = process.env.ERC20_TOKEN_ADDRESS || '0xe11a86849d99f524cac3e7a0ec1241828e332c62'
 
 export const appConfig: Config = {
   //@ts-ignore
   web3Provider: typeof window !== 'undefined' ? window.ethereum : new ethers.providers.JsonRpcProvider(nodeUri),
   gatewayUri,
-  faucetUri,
-  verbose: 2,
   gatewayAddress,
   graphHttpUri,
   marketplaceAuthToken: AuthToken.fetchMarketplaceApiTokenFromLocalStorage().token,
@@ -162,45 +159,6 @@ const SingleAsset = ({ddo}: {ddo: DDO}) => {
 }
 ```
 
-### constructRewardMap
-This function builds the logic of the rewards which the owner will receive after selling the NFT1155
-
-```tsx
-const constructRewardMap = (
-  recipientsData: any[],
-  priceWithoutFee: number,
-  ownerWalletAddress: string
-): Map<string, BigNumber> => {
-  const rewardMap: Map<string, BigNumber> = new Map()
-  let recipients: any = []
-  if (recipientsData.length === 1 && recipientsData[0].split === 0) {
-    recipients = [
-      {
-        name: ownerWalletAddress,
-        split: 100,
-        walletAddress: ownerWalletAddress
-      }
-    ]
-  }
-  let totalWithoutUser = 0
-
-  recipients.forEach((recipient: any) => {
-    if (recipient.split && recipient.split > 0) {
-      const ownSplit = ((priceWithoutFee * recipient.split) / 100).toFixed()
-      rewardMap.set(recipient.walletAddress, BigNumber.from(+ownSplit))
-      totalWithoutUser += recipient.split
-    }
-  })
-
-  if (!rewardMap.has(ownerWalletAddress)) {
-    const ownSplitReinforced = +((priceWithoutFee * (100 - totalWithoutUser)) / 100).toFixed()
-    rewardMap.set(ownerWalletAddress, BigNumber.from(ownSplitReinforced))
-  }
-
-  return rewardMap
-}
-```
-
 ### PublishAsset
 It renders a button used to publish a new [NFT](../architecture/specs/Spec-NFT.md)
 
@@ -223,7 +181,7 @@ The `BuyAsset` component will display the button `buy` in order to buy the asset
 
 ```tsx
 const BuyAsset = ({ddo}: {ddo: DDO}) => {
-  const { assets, account, isLoadingSDK, subscription, sdk } = Catalog.useNevermined()
+  const { assets, account, isLoadingSDK, nfts, sdk } = Catalog.useNevermined()
   const { walletAddress } = MetaMask.useWallet()
   const [ownNFT1155, setOwnNFT1155] = useState(false)
   const [isBought, setIsBought] = useState(false)
@@ -237,14 +195,7 @@ const BuyAsset = ({ddo}: {ddo: DDO}) => {
   }, [walletAddress, isBought])
 
   const buy = async () => {
-    const currentAccount = await getCurrentAccount(sdk)
-    if (!account.isTokenValid()
-      || account.getAddressTokenSigner().toLowerCase() !== currentAccount.getId().toLowerCase()
-    ) {
-      await account.generateToken()
-    }
-
-    const response = await subscription.buySubscription(ddo.id, currentAccount, owner, BigNumber.from(1), 1155)
+    const response = await nfts.access(ddo.id, owner, BigNumber.from(1), 1155)
     setIsBought(Boolean(response))
   }
 
@@ -291,7 +242,7 @@ The main component of the example, it pulls the rest of the components and also 
 
 ```tsx
 const App = () => {
-  const { isLoadingSDK, sdk, account } = Catalog.useNevermined()
+  const { isLoadingSDK, sdk } = Catalog.useNevermined()
   const { publishNFT1155 } = AssetService.useAssetPublish()
   const { walletAddress } = MetaMask.useWallet()
   const [ddo, setDDO] = useState<DDO>({} as DDO)
@@ -319,22 +270,23 @@ const App = () => {
   const onPublish = async () => {
     try {
       const publisher = await getCurrentAccount(sdk)
-      const rewardsRecipients: any[] = []
-      const assetRewardsMap = constructRewardMap(rewardsRecipients, BigNumber.from(100), publisher.getId())
+
+      // Here we set the rewards that will receive the publisher
+      const assetRewardsMap = new Map([
+        [publisher.getId(), BigNumber.from(1)]
+      ])
       const assetRewards = new AssetRewards(assetRewardsMap)
 
+      // We need to set network fees
+      const networkFee = await sdk.keeper.nvmConfig.getNetworkFee()
+      const feeReceiver = await sdk.keeper.nvmConfig.getFeeReceiver()
       assetRewards.addNetworkFees(feeReceiver, BigNumber.from(networkFee))
 
+      // This set the royalties that will receive for each sold
       const royaltyAttributes = {
         royaltyKind: RoyaltyKind.Standard,
         scheme: getRoyaltyScheme(sdk, RoyaltyKind.Standard),
         amount: 0,
-      }
-
-      if (!account.isTokenValid()
-        || account.getAddressTokenSigner().toLowerCase() !== publisher.getId().toLowerCase()
-      ) {
-        await account.generateToken()
       }
 
       const response = await publishNFT1155({
@@ -381,14 +333,13 @@ Now let's put everything together.
 ```tsx
 import AssetRewards from '@nevermined-io/nevermined-sdk-js/dist/node/models/AssetRewards'
 import React, { useEffect, useState } from 'react'
-import { MetaData, Logger, DDO } from '@nevermined-io/nevermined-sdk-js'
-import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
-import { Catalog, AssetService, RoyaltyKind } from '@nevermined-io/catalog-core'
-import { getCurrentAccount } from '@nevermined-io/catalog-core'
+import { Catalog, AssetService, RoyaltyKind, BigNumber, getRoyaltyScheme, getCurrentAccount, MetaData, DDO } from '@nevermined-io/catalog-core'
 import { MetaMask } from '@nevermined-io/catalog-providers'
 import { UiText, UiLayout, BEM, UiButton } from '@nevermined-io/styles'
 import styles from './example.module.scss'
-import { appConfig, erc20TokenAddress } from './config'
+import { appConfig } from './config'
+
+const ERC_TOKEN = '0xe11a86849d99f524cac3e7a0ec1241828e332c62'
 
 const b = BEM('example', styles)
 
@@ -422,40 +373,6 @@ const SingleAsset = ({ddo}: {ddo: DDO}) => {
   )
 }
 
-const constructRewardMap = (
-  recipientsData: any[],
-  priceWithoutFee: number,
-  ownerWalletAddress: string
-): Map<string, BigNumber> => {
-  const rewardMap: Map<string, BigNumber> = new Map()
-  let recipients: any = []
-  if (recipientsData.length === 1 && recipientsData[0].split === 0) {
-    recipients = [
-      {
-        name: ownerWalletAddress,
-        split: 100,
-        walletAddress: ownerWalletAddress
-      }
-    ]
-  }
-  let totalWithoutUser = 0
-
-  recipients.forEach((recipient: any) => {
-    if (recipient.split && recipient.split > 0) {
-      const ownSplit = ((priceWithoutFee * recipient.split) / 100).toFixed()
-      rewardMap.set(recipient.walletAddress, BigNumber.from(+ownSplit))
-      totalWithoutUser += recipient.split
-    }
-  })
-
-  if (!rewardMap.has(ownerWalletAddress)) {
-    const ownSplitReinforced = +((priceWithoutFee * (100 - totalWithoutUser)) / 100).toFixed()
-    rewardMap.set(ownerWalletAddress, BigNumber.from(ownSplitReinforced))
-  }
-
-  return rewardMap
-}
-
 const PublishAsset = ({onPublish}: {onPublish: () => void}) => {
   const { assets } = Catalog.useNevermined()
 
@@ -469,7 +386,7 @@ const PublishAsset = ({onPublish}: {onPublish: () => void}) => {
 }
 
 const BuyAsset = ({ddo}: {ddo: DDO}) => {
-  const { assets, account, isLoadingSDK, subscription, sdk } = Catalog.useNevermined()
+  const { assets, account, isLoadingSDK, nfts, sdk } = Catalog.useNevermined()
   const { walletAddress } = MetaMask.useWallet()
   const [ownNFT1155, setOwnNFT1155] = useState(false)
   const [isBought, setIsBought] = useState(false)
@@ -483,14 +400,8 @@ const BuyAsset = ({ddo}: {ddo: DDO}) => {
   }, [walletAddress, isBought])
 
   const buy = async () => {
-    const currentAccount = await getCurrentAccount(sdk)
-    if (!account.isTokenValid()
-      || account.getAddressTokenSigner().toLowerCase() !== currentAccount.getId().toLowerCase()
-    ) {
-      await account.generateToken()
-    }
 
-    const response = await subscription.buySubscription(ddo.id, currentAccount, owner, BigNumber.from(1), 1155)
+    const response = await nfts.access(ddo.id, owner, BigNumber.from(1), 1155)
     setIsBought(Boolean(response))
   }
 
@@ -527,7 +438,7 @@ const MMWallet = () => {
 }
 
 const App = () => {
-  const { isLoadingSDK, sdk, account } = Catalog.useNevermined()
+  const { isLoadingSDK, sdk } = Catalog.useNevermined()
   const { publishNFT1155 } = AssetService.useAssetPublish()
   const { walletAddress } = MetaMask.useWallet()
   const [ddo, setDDO] = useState<DDO>({} as DDO)
@@ -550,9 +461,11 @@ const App = () => {
   const onPublish = async () => {
     try {
       const publisher = await getCurrentAccount(sdk)
-      const rewardsRecipients: any[] = []
-      const assetRewardsMap = constructRewardMap(rewardsRecipients, BigNumber.from(100), publisher.getId())
+      const assetRewardsMap = new Map([
+        [publisher.getId(), BigNumber.from(1)]
+      ])
       const assetRewards = new AssetRewards(assetRewardsMap)
+
       const networkFee = await sdk.keeper.nvmConfig.getNetworkFee()
       const feeReceiver = await sdk.keeper.nvmConfig.getFeeReceiver()
       assetRewards.addNetworkFees(feeReceiver, BigNumber.from(networkFee))
@@ -563,9 +476,6 @@ const App = () => {
         amount: 0,
       }
 
-      if (!account.isTokenValid()) {
-        await account.generateToken()
-      }
       const response = await publishNFT1155({
         gatewayAddress: String(appConfig.gatewayAddress),
         assetRewards,

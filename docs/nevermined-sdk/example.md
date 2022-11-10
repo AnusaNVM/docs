@@ -12,64 +12,42 @@ Before you start with this demo you require:
 
 * An extension of [Metamask](https://metamask.io/) installed in your browser
 * [node](https://nodejs.org/en/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) needs to be installed
+* The Nevermined artifacts, you can find the script [here](https://github.com/nevermined-io/create-nevermined-react/blob/main/scripts/download-artifacts.sh). To use the script run `./download-artifacts.sh [VERSION OF THE CONTRACT] [NETWORK]`
 
 ## Let's start with the app config file
 The first file that you need to create is the `config.ts` file which contains all the [options needed](./api-reference/classes/Config.md) to initialize the [Nevermined SDK](./intro.md).
 
 ```ts
 import { Config } from '@nevermined-io/nevermined-sdk-js'
-import { AuthToken } from '@nevermined-io/catalog-core'
 import { ethers } from 'ethers'
 
+export const nodeUri = process.env.REACT_APP_NODE_URI || 'https://matic-mumbai.chainstacklabs.com'
 export const gatewayAddress =
   process.env.REACT_APP_GATEWAY_ADDRESS || '0x5838B5512cF9f12FE9f2beccB20eb47211F9B0bc'
 export const gatewayUri =
   process.env.REACT_APP_GATEWAY_URI || 'https://gateway.mumbai.public.nevermined.network'
-export const faucetUri =
-  process.env.REACT_APP_FAUCET_URI || 'https://faucet.rinkeby.nevermined.rocks'
 export const acceptedChainId = process.env.REACT_APP_ACCEPTED_CHAIN_ID || '80001' // for Mumbai
 export const rootUri = process.env.REACT_APP_ROOT_URI || 'http://localhost:3445'
 export const marketplaceUri = 'https://marketplace-api.mumbai.public.nevermined.network'
 const graphHttpUri = process.env.GRAPH_HTTP_URI ||  'https://api.thegraph.com/subgraphs/name/nevermined-io/public'
-export const erc20TokenAddress = process.env.ERC20_TOKEN_ADDRESS || '0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e'
+// represent USDC token in mumbai that can be claimed in the faucet https://calibration-faucet.filswan.com/#/dashboard 
+export const erc20TokenAddress = process.env.ERC20_TOKEN_ADDRESS || '0xe11a86849d99f524cac3e7a0ec1241828e332c62'
 
 export const appConfig: Config = {
   //@ts-ignore
   web3Provider: typeof window !== 'undefined' ? window.ethereum : new ethers.providers.JsonRpcProvider(nodeUri),
   gatewayUri,
-  faucetUri,
-  verbose: true,
   gatewayAddress,
   graphHttpUri,
-  marketplaceAuthToken: AuthToken.fetchMarketplaceApiTokenFromLocalStorage().token,
+  marketplaceAuthToken: localStorage.getItem('marketplaceApiToken'),
   marketplaceUri,
-  artifactsFolder: `${rootUri}/contracts`
+  artifactsFolder: `${rootUri}/contracts`,
+  newGateway: true,
 }
 ```
 
 ## The example file
 The example file `src/example/index.tsx` contains all the basic logic to handle a [NFT1155](../architecture/what-can-i-do.md#tokenization-of-assets-via-erc-1155-nfts-aka-nft-sales) as a component. It outlines each functionality and component in detail.
-
-### loadNeverminedConfigContract
-First, we need a function to load the Nevermined Contract to calculate after [the network fees](../environments/network-fees.mdx) for each purchase.
-
-```tsx
-const getFeesFromBigNumber = (fees: BigNumber): string => {
-  return (fees.toNumber() / 10000).toPrecision(2).toString()
-}
-```
-
-### getFeesFromBigNumber
-This function will calculate the network fees.
-
-```tsx
-const getFeesFromBigNumber = (fees: BigNumber): string => {
-  return (fees.toNumber() / 10000).toPrecision(2).toString()
-}
-```
-
-### Nevermined Instance
-This component will check if [sdk](../nevermined-sdk/getting-started.md) is loaded or not and display the status
 
 ### SingleAsset
 It shows the content of the ddo object published
@@ -84,45 +62,6 @@ const SingleAsset = ({ddo}: {ddo: DDO}) => {
       <UiText className={b('ddo')} variants={['detail']}>{JSON.stringify(ddo)}</UiText>
     </>
   )
-}
-```
-
-### constructRewardMap
-This function builds the logic of the rewards which the owner will receive after selling the NFT1155
-
-```tsx
-const constructRewardMap = (
-  recipientsData: any[],
-  priceWithoutFee: number,
-  ownerWalletAddress: string
-): Map<string, BigNumber> => {
-  const rewardMap: Map<string, BigNumber> = new Map()
-  let recipients: any = []
-  if (recipientsData.length === 1 && recipientsData[0].split === 0) {
-    recipients = [
-      {
-        name: ownerWalletAddress,
-        split: 100,
-        walletAddress: ownerWalletAddress
-      }
-    ]
-  }
-  let totalWithoutUser = 0
-
-  recipients.forEach((recipient: any) => {
-    if (recipient.split && recipient.split > 0) {
-      const ownSplit = ((priceWithoutFee * recipient.split) / 100).toFixed()
-      rewardMap.set(recipient.walletAddress, BigNumber.from(+ownSplit))
-      totalWithoutUser += recipient.split
-    }
-  })
-
-  if (!rewardMap.has(ownerWalletAddress)) {
-    const ownSplitReinforced = +((priceWithoutFee * (100 - totalWithoutUser)) / 100).toFixed()
-    rewardMap.set(ownerWalletAddress, BigNumber.from(ownSplitReinforced))
-  }
-
-  return rewardMap
 }
 ```
 
@@ -289,7 +228,7 @@ const App = ({config}: {config: Config }) => {
       royaltyAttributes,
       assetRewards,
       BigNumber.from(1),
-      "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e",
+      "0xe11a86849d99f524cac3e7a0ec1241828e332c62",
       true,
     )
 
@@ -298,25 +237,24 @@ const App = ({config}: {config: Config }) => {
 
   const onPublish = async () => {
     try {
-      const rewardsRecipients: any[] = []
-      const assetRewardsMap = constructRewardMap(rewardsRecipients, 100, account.getId())
+      // Here we set the rewards that will receive the publisher
+      const assetRewardsMap = new Map([
+        [account.getId(), BigNumber.from(1)]
+      ])
       const assetRewards = new AssetRewards(assetRewardsMap)
+
+      // This set the royalties that will receive for each sold
       const royaltyAttributes = {
         royaltyKind: RoyaltyKind.Standard,
         scheme: getRoyaltyScheme(sdk, RoyaltyKind.Standard),
         amount: 0,
       }
 
-      const configContract = await loadNeverminedConfigContract(config, account)
-      const networkFee = await configContract.getMarketplaceFee()
+      // We need to set network fees
+      const networkFee = await sdk.keeper.nvmConfig.getNetworkFee()
+      const feeReceiver = await sdk.keeper.nvmConfig.getFeeReceiver()
 
-      if (networkFee.gt(0)) {
-        assetRewards.addNetworkFees(
-          await configContract.getFeeReceiver(),
-          networkFee
-        )
-        Logger.log(`Network Fees: ${getFeesFromBigNumber(networkFee)}`)
-      }
+      assetRewards.addNetworkFees(feeReceiver, BigNumber.from(networkFee))
 
       const metadata: MetaData = {
         main: {
@@ -324,7 +262,7 @@ const App = ({config}: {config: Config }) => {
           files: [{
             index: 0,
             contentType: 'application/json',
-            url: 'https://github.com/nevermined-io/docs/blob/master/docs/architecture/specs/metadata/examples/ddo-example.json'
+            url: 'https://github.com/nevermined-io/docs/blob/main/docs/architecture/specs/examples/did/v0.4/ddo-example.json'
           }],
           type: 'dataset',
           author: '',
@@ -388,61 +326,13 @@ import styles from './styles.module.scss'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 const b = BEM('demo', styles)
 
+const ERC_TOKEN = '0xe11a86849d99f524cac3e7a0ec1241828e332c62'
+
 Logger.setLevel(3)
 
 const loginMarketplace = async (sdk: Nevermined, account: Account) => {
   const clientAssertion = await sdk.utils.jwt.generateClientAssertion(account)
   await sdk.marketplace.login(clientAssertion)
-}
-
-export const getFeesFromBigNumber = (fees: BigNumber): string => {
-  return (fees.toNumber() / 10000).toPrecision(2).toString()
-}
-
-export const loadNeverminedConfigContract = async (config: Config, account: Account): Promise<Contract> => {
-  const abiNvmConfig = `${config.artifactsFolder}/NeverminedConfig.mumbai.json`
-  const contractFetched = await fetch(abiNvmConfig)
-  const nvmConfigAbi = await contractFetched.json()
-
-  return new ethers.Contract(
-    nvmConfigAbi.address,
-    nvmConfigAbi.abi,
-    await account.findSigner(nvmConfigAbi.address),
-  )
-}
-
-const constructRewardMap = (
-  recipientsData: any[],
-  priceWithoutFee: number,
-  ownerWalletAddress: string
-): Map<string, BigNumber> => {
-  const rewardMap: Map<string, BigNumber> = new Map()
-  let recipients: any = []
-  if (recipientsData.length === 1 && recipientsData[0].split === 0) {
-    recipients = [
-      {
-        name: ownerWalletAddress,
-        split: 100,
-        walletAddress: ownerWalletAddress
-      }
-    ]
-  }
-  let totalWithoutUser = 0
-
-  recipients.forEach((recipient: any) => {
-    if (recipient.split && recipient.split > 0) {
-      const ownSplit = ((priceWithoutFee * recipient.split) / 100).toFixed()
-      rewardMap.set(recipient.walletAddress, BigNumber.from(+ownSplit))
-      totalWithoutUser += recipient.split
-    }
-  })
-
-  if (!rewardMap.has(ownerWalletAddress)) {
-    const ownSplitReinforced = +((priceWithoutFee * (100 - totalWithoutUser)) / 100).toFixed()
-    rewardMap.set(ownerWalletAddress, BigNumber.from(ownSplitReinforced))
-  }
-
-  return rewardMap
 }
 
 const PublishAsset = ({onPublish, }: {onPublish: () => void }) => {
@@ -596,7 +486,7 @@ const App = ({config}: {config: Config }) => {
       royaltyAttributes,
       assetRewards,
       BigNumber.from(1),
-      "0x2058A9D7613eEE744279e3856Ef0eAda5FCbaA7e",
+      "0xe11a86849d99f524cac3e7a0ec1241828e332c62",
       true,
     )
 
@@ -605,8 +495,10 @@ const App = ({config}: {config: Config }) => {
 
   const onPublish = async () => {
     try {
-      const rewardsRecipients: any[] = []
-      const assetRewardsMap = constructRewardMap(rewardsRecipients, 100, account.getId())
+      const assetRewardsMap = new Map([
+        [account.getId(), BigNumber.from(1)]
+      ])
+
       const assetRewards = new AssetRewards(assetRewardsMap)
       const royaltyAttributes = {
         royaltyKind: RoyaltyKind.Standard,
@@ -614,16 +506,10 @@ const App = ({config}: {config: Config }) => {
         amount: 0,
       }
 
-      const configContract = await loadNeverminedConfigContract(config, account)
-      const networkFee = await configContract.getMarketplaceFee()
+      const networkFee = await sdk.keeper.nvmConfig.getNetworkFee()
+      const feeReceiver = await sdk.keeper.nvmConfig.getFeeReceiver()
 
-      if (networkFee.gt(0)) {
-        assetRewards.addNetworkFees(
-          await configContract.getFeeReceiver(),
-          networkFee
-        )
-        Logger.log(`Network Fees: ${getFeesFromBigNumber(networkFee)}`)
-      }
+      assetRewards.addNetworkFees(feeReceiver, BigNumber.from(networkFee))
 
       const metadata: MetaData = {
         main: {
@@ -631,7 +517,7 @@ const App = ({config}: {config: Config }) => {
           files: [{
             index: 0,
             contentType: 'application/json',
-            url: 'https://github.com/nevermined-io/docs/blob/master/docs/architecture/specs/metadata/examples/ddo-example.json'
+            url: 'https://github.com/nevermined-io/docs/blob/main/docs/architecture/specs/examples/did/v0.4/ddo-example.json'
           }],
           type: 'dataset',
           author: '',
