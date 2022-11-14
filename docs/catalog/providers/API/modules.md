@@ -28,4 +28,4 @@
 
 #### Defined in
 
-[utils/index.ts:1](https://github.com/nevermined-io/components-catalog/blob/55c8594/providers/src/utils/index.ts#L1)
+[utils/index.ts:1](https://github.com/nevermined-io/components-catalog/blob/c3c2dc1/providers/src/utils/index.ts#L1)

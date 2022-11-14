@@ -30,7 +30,7 @@ const Example = () => {
      }))
    })()
  }, [isLoadingSDK])
- 
+
  return (
    <div>
        <button onClick={buy} disabled={isLoadingSDK}>
@@ -77,7 +77,7 @@ return the `payment` event with a functionality to unsubscribe
 
 #### Defined in
 
-[types/index.ts:610](https://github.com/nevermined-io/components-catalog/blob/55c8594/lib/src/types/index.ts#L610)
+[types/index.ts:610](https://github.com/nevermined-io/components-catalog/blob/c3c2dc1/lib/src/types/index.ts#L610)
 
 ___
 
@@ -106,4 +106,4 @@ return the `transfer` event with a functionality to unsubscribe
 
 #### Defined in
 
-[types/index.ts:617](https://github.com/nevermined-io/components-catalog/blob/55c8594/lib/src/types/index.ts#L617)
+[types/index.ts:617](https://github.com/nevermined-io/components-catalog/blob/c3c2dc1/lib/src/types/index.ts#L617)
