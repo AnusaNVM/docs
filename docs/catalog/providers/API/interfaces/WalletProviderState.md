@@ -35,7 +35,7 @@ If chain is between the available networks supported
 
 #### Defined in
 
-[src/client.tsx:99](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L99)
+[src/client.tsx:99](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L99)
 
 ___
 
@@ -51,7 +51,7 @@ All the wagmi client functionalities
 
 #### Defined in
 
-[src/client.tsx:83](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L83)
+[src/client.tsx:83](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L83)
 
 ___
 
@@ -71,7 +71,7 @@ Get all the available chains
 
 #### Defined in
 
-[src/client.tsx:93](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L93)
+[src/client.tsx:93](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L93)
 
 ___
 
@@ -91,7 +91,7 @@ Get all the connectors available
 
 #### Defined in
 
-[src/client.tsx:87](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L87)
+[src/client.tsx:87](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L87)
 
 ___
 
@@ -111,7 +111,7 @@ Metamask provider for example web3 or ethers
 
 #### Defined in
 
-[src/client.tsx:85](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L85)
+[src/client.tsx:85](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L85)
 
 ___
 
@@ -131,7 +131,7 @@ Get the status of the wallet
 
 #### Defined in
 
-[src/client.tsx:91](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L91)
+[src/client.tsx:91](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L91)
 
 ___
 
@@ -157,7 +157,7 @@ Login in Provider
 
 #### Defined in
 
-[src/client.tsx:97](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L97)
+[src/client.tsx:97](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L97)
 
 ___
 
@@ -177,7 +177,7 @@ Logout from the wallet
 
 #### Defined in
 
-[src/client.tsx:89](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L89)
+[src/client.tsx:89](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L89)
 
 ___
 
@@ -189,4 +189,4 @@ The address of the wallet account
 
 #### Defined in
 
-[src/client.tsx:95](https://github.com/nevermined-io/components-catalog/blob/f1df7fb/providers/src/client.tsx#L95)
+[src/client.tsx:95](https://github.com/nevermined-io/components-catalog/blob/5d4b912/providers/src/client.tsx#L95)
