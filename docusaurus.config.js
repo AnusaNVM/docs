@@ -1,8 +1,9 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const lightCodeTheme = require('prism-react-renderer/themes/github')
+const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -115,15 +116,15 @@ const config = {
             items: [
               {
                 label: 'Getting Started',
-                to: '/docs/getting-started/index',
+                to: '/docs/getting-started',
               },
               {
                 label: 'Architecture',
-                to: '/docs/architecture/index',
+                to: '/docs/architecture',
               },
               {
                 label: 'Tutorials',
-                to: 'docs/tutorials/index',
+                to: 'docs/tutorials',
               },
             ],
           },
@@ -204,6 +205,6 @@ const config = {
         searchPagePath: 'search',
       },
     }),
-};
+}
 
-module.exports = config;
+module.exports = config

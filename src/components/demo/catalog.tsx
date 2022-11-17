@@ -3,13 +3,13 @@ import AssetRewards from '@nevermined-io/nevermined-sdk-js/dist/node/models/Asse
 import { MetaData, Logger, DDO } from '@nevermined-io/nevermined-sdk-js'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 import { Catalog, AssetService, RoyaltyKind, getRoyaltyScheme, Config } from '@nevermined-io/catalog-core'
-import { MetaMask } from '@nevermined-io/catalog-providers'
+import { WalletProvider, useWallet, getClient } from '@nevermined-io/catalog-providers'
 import { UiText, UiLayout, BEM, UiButton } from '@nevermined-io/styles'
 import { ethers } from 'ethers'
 import styles from './styles.module.scss'
 import { appConfig } from '../config'
 
-const ERC_TOKEN = '0xe11a86849d99f524cac3e7a0ec1241828e332c62'
+const ERC_TOKEN = '0xe097d6b3100777dc31b34dc2c58fb524c2e76921'
 
 const b = BEM('demo', styles)
 
@@ -57,7 +57,7 @@ const PublishAsset = ({onPublish}: {onPublish: () => void}) => {
 
 const BuyAsset = ({ddo}: {ddo: DDO}) => {
   const { assets, account, isLoadingSDK, nfts, sdk } = Catalog.useNevermined()
-  const { walletAddress } = MetaMask.useWallet()
+  const { walletAddress } = useWallet()
   const [ownNFT1155, setOwnNFT1155] = useState(false)
   const [isBought, setIsBought] = useState(false)
   const [owner, setOwner] = useState('')
@@ -97,12 +97,12 @@ const BuyAsset = ({ddo}: {ddo: DDO}) => {
 }
 
 const MMWallet = () => {
-  const { loginMetamask, walletAddress } = MetaMask.useWallet()
+  const { login, walletAddress, getConnectors } = useWallet()
   return (
     <UiLayout>
       <UiText variants={['bold']} className={b('detail')}>Wallet address:</UiText>
       <UiText>{walletAddress}</UiText>
-      {!walletAddress && <UiButton type='secondary' onClick={loginMetamask}>Connect To MM</UiButton>}
+      {!walletAddress && <UiButton type='secondary' onClick={() => login(getConnectors()[0])}>Connect To MM</UiButton>}
     </UiLayout>
   )
 }
@@ -110,7 +110,7 @@ const MMWallet = () => {
 const App = ({ config }: {config: Config}) => {
   const { isLoadingSDK, sdk } = Catalog.useNevermined()
   const { publishNFT1155 } = AssetService.useAssetPublish()
-  const { walletAddress } = MetaMask.useWallet()
+  const { walletAddress } = useWallet()
   const [ddo, setDDO] = useState<DDO>({} as DDO)
   Logger.setLevel(3)
 
@@ -148,7 +148,7 @@ const App = ({ config }: {config: Config}) => {
       }
 
       const response = await publishNFT1155({
-        nodeAddress: config.nodeAddress,
+        neverminedNodeAddress: config.neverminedNodeAddress,
         assetRewards,
         metadata,
         nftAmount: BigNumber.from(1),
@@ -192,12 +192,12 @@ export const DemoCatalog = () => {
   return(
     <Catalog.NeverminedProvider config={config} verbose={true}>
       <AssetService.AssetPublishProvider>
-        <MetaMask.WalletProvider
-          correctNetworkId="0x13881"
-          nodeUri=""
+        <WalletProvider
+          client={getClient()}
+          correctNetworkId={80001}
         >
           <App config={ config }/>
-        </MetaMask.WalletProvider>
+        </WalletProvider>
       </AssetService.AssetPublishProvider>
     </Catalog.NeverminedProvider>
   )
