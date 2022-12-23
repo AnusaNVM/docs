@@ -31,26 +31,6 @@ _isContract detect whether the address is
 | ---- | ---- | ----------- |
 | [0] | bool | true if it is a contract address |
 
-### provenanceSignatureIsCorrect
-
-```solidity
-function provenanceSignatureIsCorrect(address _agentId, bytes32 _hash, bytes _signature) public pure returns (bool)
-```
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _agentId | address | The address of the agent |
-| _hash | bytes32 | bytes32 message, the hash is the signed message. What is recovered is the signer address. |
-| _signature | bytes | Signatures provided by the agent |
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | bool | true if the signature correspond to the agent address |
-
 ### calculateTotalAmount
 
 ```solidity
@@ -1601,6 +1581,23 @@ modifier onlyUpdateRole(bytes32 _id)
 ```solidity
 modifier onlyValidType(address typeRef)
 ```
+
+### createEpoch
+
+```solidity
+function createEpoch(struct EpochLibrary.EpochList _self, bytes32 _id, uint256 _timeLock, uint256 _timeOut) internal
+```
+
+create creates new Epoch
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _self | struct EpochLibrary.EpochList | is the Epoch storage pointer |
+| _id | bytes32 |  |
+| _timeLock | uint256 | value in block count (can not fulfill before) |
+| _timeOut | uint256 | value in block count (can not fulfill after) |
 
 ### initialize
 
@@ -3764,7 +3761,7 @@ bytes32 MARKET_ROLE
 ### erc1155
 
 ```solidity
-contract NFTUpgradeable erc1155
+contract NFT1155Upgradeable erc1155
 ```
 
 ### didRegistry
@@ -4796,12 +4793,18 @@ Vault constructor, creates a unique vault for each agreement
 | _lendingPool | address | Aave lending pool address |
 | _dataProvider | address | Aave data provider address |
 | _weth | address | WETH address |
-| _nvmFee | uint256 | Nevermined fee that will apply to this agreeement |
+| _nvmFee | uint256 | Nevermined fee that will apply to this agreement |
 | _agreementFee | uint256 | Agreement fee that lender will receive on agreement maturity |
-| _treasuryAddress | address | Address of nevermined contract to store fees |
+| _treasuryAddress | address | Address of Nevermined contract to store fees |
 | _borrower | address |  |
 | _lender | address |  |
 | _conditions | address[] |  |
+
+### createClone
+
+```solidity
+function createClone(address _lendingPool, address _dataProvider, address _weth, uint256 _nvmFee, uint256 _agreementFee, address _treasuryAddress, address _borrower, address _lender, address[] _conditions) external virtual returns (address)
+```
 
 ### isLender
 
@@ -7576,27 +7579,10 @@ struct EpochList {
 }
 ```
 
-### create
-
-```solidity
-function create(struct EpochLibrary.EpochList _self, bytes32 _id, uint256 _timeLock, uint256 _timeOut) internal
-```
-
-create creates new Epoch
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _self | struct EpochLibrary.EpochList | is the Epoch storage pointer |
-| _id | bytes32 |  |
-| _timeLock | uint256 | value in block count (can not fulfill before) |
-| _timeOut | uint256 | value in block count (can not fulfill after) |
-
 ### isTimedOut
 
 ```solidity
-function isTimedOut(struct EpochLibrary.EpochList _self, bytes32 _id) external view returns (bool)
+function isTimedOut(struct EpochLibrary.EpochList _self, bytes32 _id) internal view returns (bool)
 ```
 
 isTimedOut means you cannot fulfill after
@@ -7617,7 +7603,7 @@ isTimedOut means you cannot fulfill after
 ### isTimeLocked
 
 ```solidity
-function isTimeLocked(struct EpochLibrary.EpochList _self, bytes32 _id) external view returns (bool)
+function isTimeLocked(struct EpochLibrary.EpochList _self, bytes32 _id) internal view returns (bool)
 ```
 
 isTimeLocked means you cannot fulfill before
@@ -7638,7 +7624,7 @@ isTimeLocked means you cannot fulfill before
 ### getEpochTimeOut
 
 ```solidity
-function getEpochTimeOut(struct EpochLibrary.Epoch _self) public view returns (uint256)
+function getEpochTimeOut(struct EpochLibrary.Epoch _self) internal view returns (uint256)
 ```
 
 getEpochTimeOut
@@ -7652,7 +7638,7 @@ getEpochTimeOut
 ### getEpochTimeLock
 
 ```solidity
-function getEpochTimeLock(struct EpochLibrary.Epoch _self) public view returns (uint256)
+function getEpochTimeLock(struct EpochLibrary.Epoch _self) internal view returns (uint256)
 ```
 
 getEpochTimeLock
@@ -8314,12 +8300,6 @@ address manager
 modifier onlyDIDOwner(bytes32 _did)
 ```
 
-### onlyManager
-
-```solidity
-modifier onlyManager()
-```
-
 ### onlyOwnerProviderOrDelegated
 
 ```solidity
@@ -8351,6 +8331,12 @@ event DIDAttributeRegistered(bytes32 _did, address _owner, bytes32 _checksum, st
 ```
 
 DID Events
+
+### DIDMetadataUpdated
+
+```solidity
+event DIDMetadataUpdated(bytes32 _did, address _owner, bytes32 _checksum, string _url, string _immutableUrl)
+```
 
 ### DIDProviderRemoved
 
@@ -8394,14 +8380,6 @@ event DIDProvenanceDelegateRemoved(bytes32 _did, address _delegate, bool state)
 event DIDProvenanceDelegateAdded(bytes32 _did, address _delegate)
 ```
 
-### setManager
-
-```solidity
-function setManager(address _addr) external
-```
-
-Sets the manager role. Should be the TransferCondition contract address
-
 ### registerAttribute
 
 ```solidity
@@ -8425,7 +8403,7 @@ _The first attribute of a DID registered sets the DID owner.
 ### registerDID
 
 ```solidity
-function registerDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, bytes32 _activityId, string _attributes) public virtual
+function registerDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, bytes32 _activityId, string _immutableUrl) public virtual
 ```
 
 Register DID attributes.
@@ -8442,7 +8420,13 @@ _The first attribute of a DID registered sets the DID owner.
 | _providers | address[] | list of addresses that can act as an asset provider |
 | _url | string | refers to the url resolving the DID into a DID Document (DDO), limited to 2048 bytes. |
 | _activityId | bytes32 | refers to activity |
-| _attributes | string | refers to the provenance attributes |
+| _immutableUrl | string | refers to url stored in an immutable storage network like IPFS, Filecoin, Arweave |
+
+### updateMetadataUrl
+
+```solidity
+function updateMetadataUrl(bytes32 _did, bytes32 _checksum, string _url, string _immutableUrl) public virtual
+```
 
 ### hashDID
 
@@ -8622,22 +8606,6 @@ transferDIDOwnership transfer DID ownership
 | _did | bytes32 | refers to decentralized identifier (a bytes32 length ID) |
 | _newOwner | address | new owner address |
 
-### transferDIDOwnershipManaged
-
-```solidity
-function transferDIDOwnershipManaged(address _sender, bytes32 _did, address _newOwner) external
-```
-
-transferDIDOwnershipManaged transfer DID ownership
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _sender | address |  |
-| _did | bytes32 | refers to decentralized identifier (a bytes32 length ID) |
-| _newOwner | address | new owner address |
-
 ### _transferDIDOwnership
 
 ```solidity
@@ -8719,7 +8687,7 @@ function isDIDProviderOrOwner(bytes32 _did, address _provider) public view retur
 ### getDIDRegister
 
 ```solidity
-function getDIDRegister(bytes32 _did) public view returns (address owner, bytes32 lastChecksum, string url, address lastUpdatedBy, uint256 blockNumberUpdated, address[] providers, uint256 nftSupply, uint256 mintCap, uint256 royalties)
+function getDIDRegister(bytes32 _did) public view returns (address owner, bytes32 lastChecksum, string url, address lastUpdatedBy, uint256 blockNumberUpdated, address[] providers, uint256 nftSupply, uint256 mintCap, uint256 royalties, string immutableUrl)
 ```
 
 #### Parameters
@@ -8741,6 +8709,7 @@ function getDIDRegister(bytes32 _did) public view returns (address owner, bytes3
 | nftSupply | uint256 | the supply of nfts |
 | mintCap | uint256 | the maximum number of nfts that can be minted |
 | royalties | uint256 | the royalties amount |
+| immutableUrl | string | includes the url to the DDO in immutable storage |
 
 ### getDIDSupply
 
@@ -8963,7 +8932,7 @@ _Implementation of a Mintable DID Registry._
 ### erc1155
 
 ```solidity
-contract NFTUpgradeable erc1155
+contract NFT1155Upgradeable erc1155
 ```
 
 ### erc721
@@ -8996,10 +8965,28 @@ contract INVMConfig nvmConfig
 address conditionManager
 ```
 
+### conditionManagers
+
+```solidity
+mapping(address => bool) conditionManagers
+```
+
+### managers
+
+```solidity
+mapping(address => bool) managers
+```
+
 ### onlyConditionManager
 
 ```solidity
 modifier onlyConditionManager()
+```
+
+### onlyManager
+
+```solidity
+modifier onlyManager()
 ```
 
 ### initialize
@@ -9036,8 +9023,22 @@ function registerRoyaltiesChecker(address _addr) public
 ### setConditionManager
 
 ```solidity
-function setConditionManager(address _manager) public
+function setConditionManager(address _manager, bool state) public
 ```
+
+### setNFT1155
+
+```solidity
+function setNFT1155(address _erc1155) public
+```
+
+### setManager
+
+```solidity
+function setManager(address _addr, bool state) external
+```
+
+Sets the manager role. Should be the TransferCondition contract address
 
 ### DIDRoyaltiesAdded
 
@@ -9063,10 +9064,26 @@ function setDIDRoyalties(bytes32 _did, address _royalties) public
 function setDIDRoyaltyRecipient(bytes32 _did, address _recipient) public
 ```
 
+### transferDIDOwnershipManaged
+
+```solidity
+function transferDIDOwnershipManaged(address _sender, bytes32 _did, address _newOwner) external
+```
+
+transferDIDOwnershipManaged transfer DID ownership
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _sender | address |  |
+| _did | bytes32 | refers to decentralized identifier (a bytes32 length ID) |
+| _newOwner | address | new owner address |
+
 ### registerMintableDID
 
 ```solidity
-function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bool _mint, bytes32 _activityId, string _nftMetadata) public
+function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bool _mint, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
 ```
 
 Register a Mintable DID using NFTs based in the ERC-1155 standard.
@@ -9087,11 +9104,12 @@ _The first attribute of a DID registered sets the DID owner.
 | _mint | bool | if true it mints the ERC-1155 NFTs attached to the asset |
 | _activityId | bytes32 | refers to activity |
 | _nftMetadata | string | refers to the url providing the NFT Metadata |
+| _immutableUrl | string | includes the url to the DDO in immutable storage |
 
 ### registerMintableDID721
 
 ```solidity
-function registerMintableDID721(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _royalties, bool _mint, bytes32 _activityId, string _nftMetadata) public
+function registerMintableDID721(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _royalties, bool _mint, bytes32 _activityId, string _immutableUrl) public
 ```
 
 Register a Mintable DID using NFTs based in the ERC-721 standard.
@@ -9110,12 +9128,12 @@ _The first attribute of a DID registered sets the DID owner.
 | _royalties | uint256 | refers to the royalties to reward to the DID creator in the secondary market |
 | _mint | bool | if true it mints the ERC-1155 NFTs attached to the asset |
 | _activityId | bytes32 | refers to activity |
-| _nftMetadata | string | refers to the url providing the NFT Metadata |
+| _immutableUrl | string | includes the url to the DDO in immutable storage |
 
 ### registerMintableDID
 
 ```solidity
-function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bytes32 _activityId, string _nftMetadata) public
+function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
 ```
 
 Register a Mintable DID.
@@ -9135,6 +9153,7 @@ _The first attribute of a DID registered sets the DID owner.
 | _royalties | uint256 | refers to the royalties to reward to the DID creator in the secondary market |
 | _activityId | bytes32 | refers to activity |
 | _nftMetadata | string | refers to the url providing the NFT Metadata |
+| _immutableUrl | string | includes the url to the DDO in immutable storage |
 
 ### enableAndMintDidNft
 
@@ -9162,7 +9181,7 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 ### enableAndMintDidNft721
 
 ```solidity
-function enableAndMintDidNft721(bytes32 _did, uint256 _royalties, bool _mint, string _nftMetadata) public returns (bool success)
+function enableAndMintDidNft721(bytes32 _did, uint256 _royalties, bool _mint) public returns (bool success)
 ```
 
 enableAndMintDidNft721 creates the initial setup of NFTs minting and royalties distribution for ERC-721 NFTs.
@@ -9179,7 +9198,6 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 | _did | bytes32 | refers to decentralized identifier (a byte32 length ID) |
 | _royalties | uint256 | refers to the royalties to reward to the DID creator in the secondary market |
 | _mint | bool | if is true mint directly the amount capped tokens and lock in the _lockAddress |
-| _nftMetadata | string | refers to the url providing the NFT Metadata |
 
 ### mint
 
@@ -9248,7 +9266,7 @@ _Because ERC-1155 uses uint256 and DID's are bytes32, there is a conversion betw
 ### burn721
 
 ```solidity
-function burn721(bytes32 _did) public
+function burn721(bytes32 _did, uint256 _tokenId) public
 ```
 
 ### _provenanceStorage
@@ -9300,6 +9318,7 @@ struct DIDRegister {
   uint256 mintCap;
   address royaltyRecipient;
   contract IRoyaltyScheme royaltyScheme;
+  string immutableUrl;
 }
 ```
 
@@ -9315,7 +9334,7 @@ struct DIDRegisterList {
 ### update
 
 ```solidity
-function update(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, bytes32 _checksum, string _url, address _sender) external
+function update(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, bytes32 _checksum, string _url, address _sender, string _immutableUrl) internal
 ```
 
 update the DID store
@@ -9330,7 +9349,8 @@ _access modifiers and storage pointer should be implemented in DIDRegistry_
 | _did | bytes32 | refers to decentralized identifier (a byte32 length ID) |
 | _checksum | bytes32 | includes a one-way HASH calculated using the DDO content |
 | _url | string | includes the url resolving to the DID Document (DDO) |
-| _sender | address |  |
+| _sender | address | the address of the user updating the entry |
+| _immutableUrl | string | includes the url to the DDO in immutable storage |
 
 ### initializeNftConfig
 
@@ -9440,7 +9460,7 @@ updateDIDOwner transfer DID ownership to a new owner
 ### isProvider
 
 ```solidity
-function isProvider(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _provider) public view returns (bool)
+function isProvider(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _provider) internal view returns (bool)
 ```
 
 isProvider check whether DID provider exists
@@ -9520,7 +9540,7 @@ _update the DID registry delegates list by removing an existing delegate_
 ### isDelegate
 
 ```solidity
-function isDelegate(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _delegate) public view returns (bool)
+function isDelegate(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _delegate) internal view returns (bool)
 ```
 
 isDelegate check whether DID delegate exists
@@ -11347,138 +11367,6 @@ _getNvmConfigAddress get the address of the NeverminedConfig contract_
 function setNvmConfigAddress(address _addr) external
 ```
 
-## AgreementStoreManagerChangeFunctionSignature
-
-### createAgreement
-
-```solidity
-function createAgreement(bytes32 _id, bytes32 _did, address[] _conditionTypes, bytes32[] _conditionIds, uint256[] _timeLocks, uint256[] _timeOuts, address _creator, address _sender) public
-```
-
-## AgreementStoreManagerChangeInStorage
-
-### agreementCount
-
-```solidity
-uint256 agreementCount
-```
-
-## AgreementStoreManagerChangeInStorageAndLogic
-
-## AgreementStoreManagerExtraFunctionality
-
-### dummyFunction
-
-```solidity
-function dummyFunction() public pure returns (bool)
-```
-
-## AgreementStoreManagerWithBug
-
-### getDIDRegistryAddress
-
-```solidity
-function getDIDRegistryAddress() public pure returns (address)
-```
-
-_getDIDRegistryAddress utility function 
-used by other contracts or any EOA._
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | address | the DIDRegistry address |
-
-## ConditionStoreChangeFunctionSignature
-
-### createCondition
-
-```solidity
-function createCondition(bytes32 _id, address _typeRef, address _sender) public
-```
-
-## ConditionStoreChangeInStorage
-
-### conditionCount
-
-```solidity
-uint256 conditionCount
-```
-
-## ConditionStoreChangeInStorageAndLogic
-
-## ConditionStoreExtraFunctionality
-
-### dummyFunction
-
-```solidity
-function dummyFunction() public pure returns (bool)
-```
-
-## ConditionStoreWithBug
-
-### getConditionState
-
-```solidity
-function getConditionState(bytes32 _id) public view returns (enum ConditionStoreLibrary.ConditionState)
-```
-
-_getConditionState_
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0] | enum ConditionStoreLibrary.ConditionState | condition state |
-
-## DIDRegistryChangeFunctionSignature
-
-### registerAttribute
-
-```solidity
-function registerAttribute(bytes32 _didSeed, address[] _providers, bytes32 _checksum, string _url) public
-```
-
-## DIDRegistryChangeInStorage
-
-### timeOfRegister
-
-```solidity
-mapping(bytes32 => uint256) timeOfRegister
-```
-
-## DIDRegistryChangeInStorageAndLogic
-
-## DIDRegistryExtraFunctionality
-
-### getNumber
-
-```solidity
-function getNumber() public pure returns (uint256)
-```
-
-## DIDRegistryWithBug
-
-### registerAttribute
-
-```solidity
-function registerAttribute(bytes32 _checksum, bytes32 _didSeed, address[] _providers, string _url) public
-```
-
-registerAttribute is called only by DID owner.
-
-_this function registers DID attributes_
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _checksum | bytes32 | includes a one-way HASH calculated using the DDO content |
-| _didSeed | bytes32 | refers to decentralized identifier (a byte32 length ID) |
-| _providers | address[] |  |
-| _url | string | refers to the attribute value |
-
 ## IPNFT
 
 ### TokenURIChanged
@@ -11517,83 +11405,6 @@ function mintWithoutTokenURI(address to, uint256 _tokenId) external
 function transfer(address from, address to, uint256 _tokenId) public
 ```
 
-## NeverminedConfigChangeInStorage
-
-### newVariable
-
-```solidity
-uint256 newVariable
-```
-
-## NeverminedConfigChangeFunctionSignature
-
-### setMarketplaceFees
-
-```solidity
-function setMarketplaceFees(uint256 _marketplaceFee, address _feeReceiver, uint256 _newParameter) external virtual
-```
-
-## NeverminedConfigChangeInStorageAndLogic
-
-## NeverminedConfigWithBug
-
-### setMarketplaceFees
-
-```solidity
-function setMarketplaceFees(uint256 _marketplaceFee, address _feeReceiver) external virtual
-```
-
-The governor can update the Nevermined Marketplace fees
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _marketplaceFee | uint256 | new marketplace fee |
-| _feeReceiver | address | The address receiving the fee |
-
-## TemplateStoreChangeFunctionSignature
-
-### proposeTemplate
-
-```solidity
-function proposeTemplate(address _id, address _sender) external returns (uint256 size)
-```
-
-## TemplateStoreChangeInStorage
-
-### templateCount
-
-```solidity
-uint256 templateCount
-```
-
-## TemplateStoreChangeInStorageAndLogic
-
-## TemplateStoreExtraFunctionality
-
-### dummyFunction
-
-```solidity
-function dummyFunction() public pure returns (bool)
-```
-
-## TemplateStoreWithBug
-
-### getTemplateListSize
-
-```solidity
-function getTemplateListSize() external view returns (uint256 size)
-```
-
-getTemplateListSize number of templates
-
-#### Return Values
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| size | uint256 | number of templates |
-
 ## TestDisputeManager
 
 ### accept
@@ -11629,18 +11440,6 @@ function mint(uint256 id) public
 ```
 
 ## EpochLibraryProxy
-
-### epoch
-
-```solidity
-struct EpochLibrary.Epoch epoch
-```
-
-### epochList
-
-```solidity
-struct EpochLibrary.EpochList epochList
-```
 
 ### create
 
@@ -11804,6 +11603,12 @@ string _contractMetadataUri
 address nvmConfig
 ```
 
+### NFTCloned
+
+```solidity
+event NFTCloned(address _newAddress, address _fromAddress, uint256 _ercType)
+```
+
 ### getNvmConfigAddress
 
 ```solidity
@@ -11836,6 +11641,12 @@ Event for recording proxy approvals.
 
 ```solidity
 function setProxyApproval(address operator, bool approved) public virtual
+```
+
+### isApprovedProxy
+
+```solidity
+function isApprovedProxy(address operator) public virtual returns (bool)
 ```
 
 ### _setNFTMetadata
@@ -11880,6 +11691,18 @@ _Record the URI storing the Metadata describing the NFT Contract
 function contractURI() public view returns (string)
 ```
 
+### addMinter
+
+```solidity
+function addMinter(address account) public virtual
+```
+
+### revokeMinter
+
+```solidity
+function revokeMinter(address account) public virtual
+```
+
 ### _msgSender
 
 ```solidity
@@ -11892,7 +11715,7 @@ function _msgSender() internal view virtual returns (address ret)
 function _msgData() internal view virtual returns (bytes ret)
 ```
 
-## NFTUpgradeable
+## NFT1155Upgradeable
 
 _Implementation of the basic standard multi-token.
 See https://eips.ethereum.org/EIPS/eip-1155_
@@ -11921,6 +11744,12 @@ function initializeWithName(string name_, string symbol_, string uri_) public vi
 function initialize(string uri_) public
 ```
 
+### createClone
+
+```solidity
+function createClone(string _name, string _symbol, string _uri) external virtual returns (address)
+```
+
 ### isApprovedForAll
 
 ```solidity
@@ -11939,12 +11768,6 @@ function mint(address to, uint256 id, uint256 amount, bytes data) public
 
 ```solidity
 function burn(address to, uint256 id, uint256 amount) public
-```
-
-### addMinter
-
-```solidity
-function addMinter(address account) public
 ```
 
 ### uri
@@ -12002,12 +11825,20 @@ function _msgSender() internal view virtual returns (address ret)
 function _msgData() internal view virtual returns (bytes ret)
 ```
 
+### _beforeTokenTransfer
+
+```solidity
+function _beforeTokenTransfer(address operator, address from, address to, uint256[] ids, uint256[] amounts, bytes data) internal virtual
+```
+
+_It protects NFT transfers to force going through service agreements and enforce royalties_
+
 ## NFT721SubscriptionUpgradeable
 
 ### mint
 
 ```solidity
-function mint(address to, uint256 id, uint256 expirationBlock) public
+function mint(address to, uint256 tokenId, uint256 expirationBlock) public
 ```
 
 _This mint function allows to define when the NFT expires. 
@@ -12027,10 +11858,28 @@ _See {IERC721-balanceOf}._
 
 _Implementation of the basic standard multi-token._
 
+### _nftContractCap
+
+```solidity
+uint256 _nftContractCap
+```
+
+### _counterMinted
+
+```solidity
+struct CountersUpgradeable.Counter _counterMinted
+```
+
 ### initializeWithName
 
 ```solidity
-function initializeWithName(string name, string symbol, string uri) public virtual
+function initializeWithName(string name, string symbol) public virtual
+```
+
+### initializeWithAttributes
+
+```solidity
+function initializeWithAttributes(string name, string symbol, string uri, uint256 cap) public virtual
 ```
 
 ### initialize
@@ -12039,39 +11888,54 @@ function initializeWithName(string name, string symbol, string uri) public virtu
 function initialize() public virtual
 ```
 
+### createClone
+
+```solidity
+function createClone(string name, string symbol, string uri, uint256 cap) external virtual returns (address)
+```
+
 ### isApprovedForAll
 
 ```solidity
 function isApprovedForAll(address account, address operator) public view virtual returns (bool)
 ```
 
-_See {IERC1155-isApprovedForAll}._
-
-### addMinter
+### mint
 
 ```solidity
-function addMinter(address account) public
+function mint(address to, uint256 tokenId) public virtual
 ```
 
 ### mint
 
 ```solidity
-function mint(address to, uint256 id) public virtual
+function mint(uint256 tokenId) public virtual
+```
+
+### getHowManyMinted
+
+```solidity
+function getHowManyMinted() public view returns (uint256)
 ```
 
 ### burn
 
 ```solidity
-function burn(uint256 id) public
+function burn(uint256 tokenId) public
 ```
 
-### tokenURI
+_Burning tokens does not decrement the counter of tokens minted!
+     This is by design._
+
+### _baseURI
 
 ```solidity
-function tokenURI(uint256 tokenId) public view virtual returns (string)
+function _baseURI() internal view virtual returns (string)
 ```
 
-_See {IERC721Metadata-tokenURI}._
+_Base URI for computing {tokenURI}. If set, the resulting URI for each
+token will be the concatenation of the `baseURI` and the `tokenId`. Empty
+by default, can be overridden in child contracts._
 
 ### setNFTMetadata
 
@@ -12087,6 +11951,14 @@ _Record some NFT Metadata_
 | ---- | ---- | ----------- |
 | tokenId | uint256 | the id of the asset with the royalties associated |
 | nftURI | string | the URI (https, ipfs, etc) to the metadata describing the NFT |
+
+### tokenURI
+
+```solidity
+function tokenURI(uint256 tokenId) public view virtual returns (string)
+```
+
+_See {IERC721Metadata-tokenURI}._
 
 ### setTokenRoyalty
 
@@ -12122,13 +11994,15 @@ function _msgSender() internal view virtual returns (address ret)
 function _msgData() internal view virtual returns (bytes ret)
 ```
 
-## POAPUpgradeable
-
-### _tokenIdCounter
+### _beforeTokenTransfer
 
 ```solidity
-struct CountersUpgradeable.Counter _tokenIdCounter
+function _beforeTokenTransfer(address from, address to, uint256, uint256 batchSize) internal virtual
 ```
+
+_It protects NFT transfers to force going through service agreements and enforce royalties_
+
+## POAPUpgradeable
 
 ### _tokenEvent
 
@@ -12136,28 +12010,34 @@ struct CountersUpgradeable.Counter _tokenIdCounter
 mapping(uint256 => uint256) _tokenEvent
 ```
 
-### initialize
+### mint
 
 ```solidity
-function initialize() public
-```
-
-### initializeWithName
-
-```solidity
-function initializeWithName(string name, string symbol, string uri) public virtual
+function mint(address to, uint256 tokenId, uint256 eventId) public virtual
 ```
 
 ### mint
 
 ```solidity
-function mint(address to, string uri, uint256 eventId) public
+function mint(address to, uint256 eventId) public virtual
 ```
 
 ### mint
 
 ```solidity
-function mint(address to, uint256 id) public
+function mint(address to) public virtual
+```
+
+### mintBatch
+
+```solidity
+function mintBatch(address[] to, uint256[] tokenIds, uint256[] eventIds) public virtual
+```
+
+### burnBatch
+
+```solidity
+function burnBatch(uint256[] tokenIds) public virtual
 ```
 
 ### tokenEvent
@@ -12166,17 +12046,21 @@ function mint(address to, uint256 id) public
 function tokenEvent(uint256 tokenId) public view returns (uint256)
 ```
 
-### _beforeTokenTransfer
-
-```solidity
-function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal
-```
-
 ### _burn
 
 ```solidity
 function _burn(uint256 tokenId) internal
 ```
+
+_Destroys `tokenId`.
+The approval is cleared when the token is burned.
+This is an internal function that does not check if the sender is authorized to operate on the token.
+
+Requirements:
+
+- `tokenId` must exist.
+
+Emits a {Transfer} event._
 
 ### tokenDetailsOfOwner
 
@@ -12184,22 +12068,34 @@ function _burn(uint256 tokenId) internal
 function tokenDetailsOfOwner(address owner) public view returns (uint256[] tokenIds, uint256[] eventIds)
 ```
 
-### tokenURI
+### supportsInterface
 
 ```solidity
-function tokenURI(uint256 tokenId) public view returns (string)
+function supportsInterface(bytes4 interfaceId) public view virtual returns (bool)
 ```
 
 ### isApprovedForAll
 
 ```solidity
-function isApprovedForAll(address account, address operator) public view returns (bool)
+function isApprovedForAll(address account, address operator) public view virtual returns (bool)
 ```
 
-### supportsInterface
+### _baseURI
 
 ```solidity
-function supportsInterface(bytes4 interfaceId) public view virtual returns (bool)
+function _baseURI() internal view returns (string)
+```
+
+### tokenURI
+
+```solidity
+function tokenURI(uint256 tokenId) public view virtual returns (string)
+```
+
+### _beforeTokenTransfer
+
+```solidity
+function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 tokenId) internal
 ```
 
 ### _msgSender
@@ -12212,6 +12108,14 @@ function _msgSender() internal view virtual returns (address ret)
 
 ```solidity
 function _msgData() internal view virtual returns (bytes ret)
+```
+
+## SoulBoundUpgradeable
+
+### _beforeTokenTransfer
+
+```solidity
+function _beforeTokenTransfer(address, address, uint256, uint256) internal virtual
 ```
 
 ## PlonkVerifier
