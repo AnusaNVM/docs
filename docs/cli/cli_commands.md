@@ -345,6 +345,36 @@ ncli assets search &quot;some text&quot;
 
 
 
+### query [query]
+Searching for assets in a Nevermined environment using Elasticsearch query<br/>
+
+All user metadata for registering assets in Nevermined can be searched and indexed later. Typically different assets can be organized in independent Marketplaces grouped by topic or domain. This command allows to query one of the Marketplace environments searching for data using a query provided by the user.<br/>
+
+#### Positional Arguments
+
+| Name of the Argument | Type | Is required? | Default value | Description |
+|----------------------|------|-------------:|--------------:|-------------|
+| **query** | `string` |  |    | The search query |
+
+
+#### Optional Arguments
+
+| Name of the Argument | Type | Is required? | Default value | Description |
+|----------------------|------|-------------:|--------------:|-------------|
+| **offset** | `number` |  |  `10`  | The number of elements to obtain from the search query |
+| **page** | `number` |  |  `1`  | The page to show |
+| **onlyMetadata** | `boolean` |  |  `false`  | True if we only want to get metadata |
+
+
+#### Example/s
+
+
+```bash
+ncli assets query {query}
+```
+
+
+
 ### download [did]
 Download an asset owned by me<br/>
 
