@@ -1312,13 +1312,8 @@ It decrypts a previously encrypted file using the password provided.<br/>
 | Name of the Argument | Type | Is required? | Default value | Description |
 |----------------------|------|-------------:|--------------:|-------------|
 | **file** | `string` |  |    | The path to the file to decrypt |
-
-
-#### Optional Arguments
-
-| Name of the Argument | Type | Is required? | Default value | Description |
-|----------------------|------|-------------:|--------------:|-------------|
 | **password** | `string` |  |    | The password to be used to decrypt the file |
+
 
 
 #### Example/s
@@ -1326,6 +1321,34 @@ It decrypts a previously encrypted file using the password provided.<br/>
 
 ```bash
 ncli utils decrypt README.md --password 12345678
+```
+
+
+
+### encrypt [file]
+Encrypt a file<br/>
+
+It encrypts a file using the password provided.<br/>
+
+#### Positional Arguments
+
+| Name of the Argument | Type | Is required? | Default value | Description |
+|----------------------|------|-------------:|--------------:|-------------|
+| **file** | `string` |  |    | The path to the file to encrypt |
+
+
+#### Optional Arguments
+
+| Name of the Argument | Type | Is required? | Default value | Description |
+|----------------------|------|-------------:|--------------:|-------------|
+| **password** | `string` |  |    | The password to be used to encrypt the file. If empty, a new password will be generated |
+
+
+#### Example/s
+
+
+```bash
+ncli utils encrypt README.md --password 12345678
 ```
 
 
