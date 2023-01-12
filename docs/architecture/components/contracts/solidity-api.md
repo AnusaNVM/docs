@@ -20096,7 +20096,19 @@ function getProvenanceOwner(bytes32 _did) public view returns (address provenanc
 
 ## DIDRegistry
 
-_Implementation of a Mintable DID Registry._
+_Implementation of an on-chain registry of assets. It allows users to register their digital assets
+and the on-chain resolution of them via a Decentralized Identifier (DID) into their Metadata (DDO).  
+
+The permissions are organized in different levels:
+
+1. Contract Ownership Level. At the top level the DID Registry contract is 'Ownable' so the owner (typically the deployer) of the contract
+   can manage everything in the registry.
+2. Contract Operator Level. At the second level we have the Registry contract operator `REGISTRY_OPERATOR_ROLE`. Typically this role is 
+   granted to some Nevermined contracts to automate the execution of common functions.
+   This role is managed using the  `grantRegistryOperatorRole` and `revokeRegistryOperatorRole` function
+3. Asset Access Level. Asset owners can provide individual asset permissions to external providers via the `addProvider` function.
+   Providers typically (Nevermined Nodes) can manage asset access. 
+4. Asset Provenance Level. Provenance delegates can register provenance events at asset level._
 
 ### erc1155
 
@@ -20128,34 +20140,16 @@ contract StandardRoyalties defaultRoyalties
 contract INVMConfig nvmConfig
 ```
 
-### conditionManager
+### REGISTRY_OPERATOR_ROLE
 
 ```solidity
-address conditionManager
+bytes32 REGISTRY_OPERATOR_ROLE
 ```
 
-### conditionManagers
+### onlyRegistryOperator
 
 ```solidity
-mapping(address => bool) conditionManagers
-```
-
-### managers
-
-```solidity
-mapping(address => bool) managers
-```
-
-### onlyConditionManager
-
-```solidity
-modifier onlyConditionManager()
-```
-
-### onlyManager
-
-```solidity
-modifier onlyManager()
+modifier onlyRegistryOperator()
 ```
 
 ### initialize
@@ -20189,25 +20183,29 @@ function setDefaultRoyalties(address _royalties) public
 function registerRoyaltiesChecker(address _addr) public
 ```
 
-### setConditionManager
-
-```solidity
-function setConditionManager(address _manager, bool state) public
-```
-
 ### setNFT1155
 
 ```solidity
 function setNFT1155(address _erc1155) public
 ```
 
-### setManager
+### grantRegistryOperatorRole
 
 ```solidity
-function setManager(address _addr, bool state) external
+function grantRegistryOperatorRole(address account) public virtual
 ```
 
-Sets the manager role. Should be the TransferCondition contract address
+### revokeRegistryOperatorRole
+
+```solidity
+function revokeRegistryOperatorRole(address account) public virtual
+```
+
+### isRegistryOperator
+
+```solidity
+function isRegistryOperator(address operator) public view virtual returns (bool)
+```
 
 ### DIDRoyaltiesAdded
 
@@ -20444,10 +20442,10 @@ function burn721(bytes32 _did, uint256 _tokenId) public
 function _provenanceStorage() internal view returns (bool)
 ```
 
-### condition
+### registerUsedProvenance
 
 ```solidity
-function condition(bytes32 _did, bytes32 _cond, string name, address user) public
+function registerUsedProvenance(bytes32 _did, bytes32 _cond, string name, address user) public
 ```
 
 ### getNvmConfigAddress
@@ -21010,6 +21008,18 @@ The content to sign is a representation of the footprint of the event (_did + _d
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | success | bool | true if the action was properly registered |
+
+### _msgSender
+
+```solidity
+function _msgSender() internal view virtual returns (address ret)
+```
+
+### _msgData
+
+```solidity
+function _msgData() internal view virtual returns (bytes ret)
+```
 
 ## CurveRoyalties
 
@@ -22713,16 +22723,10 @@ function isIndexed() external view returns (bool)
 _Implementation of the Royalties EIP-2981 base contract
 See https://eips.ethereum.org/EIPS/eip-2981_
 
-### _proxyApprovals
+### NVM_OPERATOR_ROLE
 
 ```solidity
-mapping(address => bool) _proxyApprovals
-```
-
-### MINTER_ROLE
-
-```solidity
-bytes32 MINTER_ROLE
+bytes32 NVM_OPERATOR_ROLE
 ```
 
 ### RoyaltyInfo
@@ -22798,26 +22802,6 @@ _getNvmConfigAddress get the address of the NeverminedConfig contract_
 function setNvmConfigAddress(address _addr) external
 ```
 
-### ProxyApproval
-
-```solidity
-event ProxyApproval(address sender, address operator, bool approved)
-```
-
-Event for recording proxy approvals.
-
-### setProxyApproval
-
-```solidity
-function setProxyApproval(address operator, bool approved) public virtual
-```
-
-### isApprovedProxy
-
-```solidity
-function isApprovedProxy(address operator) public virtual returns (bool)
-```
-
 ### _setNFTMetadata
 
 ```solidity
@@ -22860,16 +22844,22 @@ _Record the URI storing the Metadata describing the NFT Contract
 function contractURI() public view returns (string)
 ```
 
-### addMinter
+### grantOperatorRole
 
 ```solidity
-function addMinter(address account) public virtual
+function grantOperatorRole(address account) public virtual
 ```
 
-### revokeMinter
+### revokeOperatorRole
 
 ```solidity
-function revokeMinter(address account) public virtual
+function revokeOperatorRole(address account) public virtual
+```
+
+### isOperator
+
+```solidity
+function isOperator(address operator) public view virtual returns (bool)
 ```
 
 ### _msgSender
@@ -22904,7 +22894,7 @@ string symbol
 ### initializeWithName
 
 ```solidity
-function initializeWithName(string name_, string symbol_, string uri_) public virtual
+function initializeWithName(address owner, string name_, string symbol_, string uri_) public virtual
 ```
 
 ### initialize
@@ -23013,7 +23003,7 @@ function mint(address to, uint256 tokenId, uint256 expirationBlock) public
 _This mint function allows to define when the NFT expires. 
 The minter should calculate this block number depending on the network velocity
 
-TransferNFT721Condition needs to have the `MINTER_ROLE`_
+TransferNFT721Condition needs to have the `NVM_OPERATOR_ROLE`_
 
 ### balanceOf
 
@@ -23048,7 +23038,7 @@ function initializeWithName(string name, string symbol) public virtual
 ### initializeWithAttributes
 
 ```solidity
-function initializeWithAttributes(string name, string symbol, string uri, uint256 cap) public virtual
+function initializeWithAttributes(address owner, string name, string symbol, string uri, uint256 cap) public virtual
 ```
 
 ### initialize
