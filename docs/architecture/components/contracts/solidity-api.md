@@ -11839,11 +11839,7 @@ _Implementation of the Agreement Store Library.
 
 ```solidity
 struct Agreement {
-  bytes32 did;
   address templateId;
-  bytes32[] conditionIds;
-  address lastUpdatedBy;
-  uint256 blockNumberUpdated;
 }
 ```
 
@@ -11854,14 +11850,13 @@ struct AgreementList {
   mapping(bytes32 => struct AgreementStoreLibrary.Agreement) agreements;
   mapping(bytes32 => bytes32[]) didToAgreementIds;
   mapping(address => bytes32[]) templateIdToAgreementIds;
-  bytes32[] agreementIds;
 }
 ```
 
 ### create
 
 ```solidity
-function create(struct AgreementStoreLibrary.AgreementList _self, bytes32 _id, bytes32, address _templateId, bytes32[]) internal
+function create(struct AgreementStoreLibrary.AgreementList _self, bytes32 _id, address _templateId) internal
 ```
 
 _create new agreement
@@ -11874,9 +11869,7 @@ _create new agreement
 | ---- | ---- | ----------- |
 | _self | struct AgreementStoreLibrary.AgreementList | is AgreementList storage pointer |
 | _id | bytes32 | agreement identifier |
-|  | bytes32 |  |
 | _templateId | address | template identifier |
-|  | bytes32[] |  |
 
 ## Template
 
@@ -12602,9 +12595,6 @@ enum ConditionState {
 struct Condition {
   address typeRef;
   enum ConditionStoreLibrary.ConditionState state;
-  address createdBy;
-  address lastUpdatedBy;
-  uint256 blockNumberUpdated;
 }
 ```
 
@@ -12614,7 +12604,6 @@ struct Condition {
 struct ConditionList {
   mapping(bytes32 => struct ConditionStoreLibrary.Condition) conditions;
   mapping(bytes32 => mapping(bytes32 => bytes32)) map;
-  bytes32[] conditionIds;
 }
 ```
 
@@ -18758,7 +18747,6 @@ struct Epoch {
 ```solidity
 struct EpochList {
   mapping(bytes32 => struct EpochLibrary.Epoch) epochs;
-  bytes32[] epochIds;
 }
 ```
 
@@ -20434,7 +20422,6 @@ struct DIDRegister {
 ```solidity
 struct DIDRegisterList {
   mapping(bytes32 => struct DIDRegistryLibrary.DIDRegister) didRegisters;
-  bytes32[] didRegisterIds;
 }
 ```
 
