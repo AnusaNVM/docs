@@ -12718,7 +12718,7 @@ address nvmConfigAddress
 ### didRegistry
 
 ```solidity
-contract DIDRegistry didRegistry
+contract IExternalRegistry didRegistry
 ```
 
 ### ConditionCreated
@@ -18402,6 +18402,20 @@ function canBePurchased(bytes32 did) external view returns (bool)
 function withdraw(bytes32 did, address withdrawAddress) external returns (bool)
 ```
 
+## IExternalRegistry
+
+### used
+
+```solidity
+function used(bytes32 _provId, bytes32 _did, address _agentId, bytes32 _activityId, bytes _signatureUsing, string _attributes) external returns (bool success)
+```
+
+### getDIDOwner
+
+```solidity
+function getDIDOwner(bytes32 _did) external view returns (address didOwner)
+```
+
 ## IList
 
 ### has
@@ -19487,12 +19501,6 @@ modifier onlyValidAttributes(string _attributes)
 modifier nftIsInitialized(bytes32 _did)
 ```
 
-### nft721IsInitialized
-
-```solidity
-modifier nft721IsInitialized(bytes32 _did)
-```
-
 ### DIDAttributeRegistered
 
 ```solidity
@@ -19856,7 +19864,7 @@ function isDIDProviderOrOwner(bytes32 _did, address _provider) public view retur
 ### getDIDRegister
 
 ```solidity
-function getDIDRegister(bytes32 _did) public view returns (address owner, bytes32 lastChecksum, string url, address lastUpdatedBy, uint256 blockNumberUpdated, address[] providers, uint256 nftSupply, uint256 mintCap, uint256 royalties, string immutableUrl)
+function getDIDRegister(bytes32 _did) public view returns (address owner, bytes32 lastChecksum, string url, address lastUpdatedBy, uint256 blockNumberUpdated, address[] providers, uint256 royalties, string immutableUrl, bool nftInitialized)
 ```
 
 #### Parameters
@@ -19875,15 +19883,14 @@ function getDIDRegister(bytes32 _did) public view returns (address owner, bytes3
 | lastUpdatedBy | address | who was the last updating the DID |
 | blockNumberUpdated | uint256 | In which block was the DID updated |
 | providers | address[] | the list of providers |
-| nftSupply | uint256 | the supply of nfts |
-| mintCap | uint256 | the maximum number of nfts that can be minted |
 | royalties | uint256 | the royalties amount |
 | immutableUrl | string | includes the url to the DDO in immutable storage |
+| nftInitialized | bool | if the NFT has been initialized |
 
-### getDIDSupply
+### getNFTInfo
 
 ```solidity
-function getDIDSupply(bytes32 _did) public view returns (uint256 nftSupply, uint256 mintCap)
+function getNFTInfo(bytes32 _did) public view returns (address nftContractAddress, bool nftInitialized)
 ```
 
 ### getBlockNumberUpdated
@@ -20250,7 +20257,7 @@ transferDIDOwnershipManaged transfer DID ownership
 ### registerMintableDID
 
 ```solidity
-function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bool _mint, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
+function registerMintableDID(bytes32 _didSeed, address _nftContractAddress, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bool _mint, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
 ```
 
 Register a Mintable DID using NFTs based in the ERC-1155 standard.
@@ -20263,6 +20270,7 @@ _The first attribute of a DID registered sets the DID owner.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _didSeed | bytes32 | refers to decentralized identifier seed (a bytes32 length ID). |
+| _nftContractAddress | address | is the address of the NFT contract associated to the asset |
 | _checksum | bytes32 | includes a one-way HASH calculated using the DDO content. |
 | _providers | address[] | list of addresses that can act as an asset provider |
 | _url | string | refers to the url resolving the DID into a DID Document (DDO), limited to 2048 bytes. |
@@ -20276,7 +20284,7 @@ _The first attribute of a DID registered sets the DID owner.
 ### registerMintableDID721
 
 ```solidity
-function registerMintableDID721(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _royalties, bool _mint, bytes32 _activityId, string _immutableUrl) public
+function registerMintableDID721(bytes32 _didSeed, address _nftContractAddress, bytes32 _checksum, address[] _providers, string _url, uint256 _royalties, bool _mint, bytes32 _activityId, string _immutableUrl) public
 ```
 
 Register a Mintable DID using NFTs based in the ERC-721 standard.
@@ -20289,6 +20297,7 @@ _The first attribute of a DID registered sets the DID owner.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _didSeed | bytes32 | refers to decentralized identifier seed (a bytes32 length ID). |
+| _nftContractAddress | address | address of the NFT contract associated to the asset |
 | _checksum | bytes32 | includes a one-way HASH calculated using the DDO content. |
 | _providers | address[] | list of addresses that can act as an asset provider |
 | _url | string | refers to the url resolving the DID into a DID Document (DDO), limited to 2048 bytes. |
@@ -20300,7 +20309,7 @@ _The first attribute of a DID registered sets the DID owner.
 ### registerMintableDID
 
 ```solidity
-function registerMintableDID(bytes32 _didSeed, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
+function registerMintableDID(bytes32 _didSeed, address _nftContractAddress, bytes32 _checksum, address[] _providers, string _url, uint256 _cap, uint256 _royalties, bytes32 _activityId, string _nftMetadata, string _immutableUrl) public
 ```
 
 Register a Mintable DID.
@@ -20313,6 +20322,7 @@ _The first attribute of a DID registered sets the DID owner.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _didSeed | bytes32 | refers to decentralized identifier seed (a bytes32 length ID). |
+| _nftContractAddress | address | address of the NFT contract associated to the asset |
 | _checksum | bytes32 | includes a one-way HASH calculated using the DDO content. |
 | _providers | address[] | list of addresses that can act as an asset provider |
 | _url | string | refers to the url resolving the DID into a DID Document (DDO), limited to 2048 bytes. |
@@ -20325,7 +20335,7 @@ _The first attribute of a DID registered sets the DID owner.
 ### enableAndMintDidNft
 
 ```solidity
-function enableAndMintDidNft(bytes32 _did, uint256 _cap, uint256 _royalties, bool _mint, string _nftMetadata) public returns (bool success)
+function enableAndMintDidNft(bytes32 _did, address _nftAddress, uint256 _cap, uint256 _royalties, bool _mint, string _nftMetadata) public returns (bool success)
 ```
 
 enableDidNft creates the initial setup of NFTs minting and royalties distribution for ERC-1155 NFTs.
@@ -20340,6 +20350,7 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _did | bytes32 | refers to decentralized identifier (a byte32 length ID) |
+| _nftAddress | address |  |
 | _cap | uint256 | refers to the mint cap |
 | _royalties | uint256 | refers to the royalties to reward to the DID creator in the secondary market |
 | _mint | bool | if is true mint directly the amount capped tokens and lock in the _lockAddress |
@@ -20348,7 +20359,7 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 ### enableAndMintDidNft721
 
 ```solidity
-function enableAndMintDidNft721(bytes32 _did, uint256 _royalties, bool _mint) public returns (bool success)
+function enableAndMintDidNft721(bytes32 _did, address _nftContractAddress, uint256 _royalties, bool _mint) public returns (bool success)
 ```
 
 enableAndMintDidNft721 creates the initial setup of NFTs minting and royalties distribution for ERC-721 NFTs.
@@ -20363,78 +20374,9 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | _did | bytes32 | refers to decentralized identifier (a byte32 length ID) |
+| _nftContractAddress | address | address of the NFT contract associated to the asset |
 | _royalties | uint256 | refers to the royalties to reward to the DID creator in the secondary market |
 | _mint | bool | if is true mint directly the amount capped tokens and lock in the _lockAddress |
-
-### mint
-
-```solidity
-function mint(bytes32 _did, uint256 _amount, address _receiver) public
-```
-
-Mints a NFT associated to the DID
-
-_Because ERC-1155 uses uint256 and DID's are bytes32, there is a conversion between both
-     Only the DID owner can mint NFTs associated to the DID_
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _did | bytes32 | refers to decentralized identifier (a bytes32 length ID). |
-| _amount | uint256 | amount to mint |
-| _receiver | address | the address that will receive the new nfts minted |
-
-### mint
-
-```solidity
-function mint(bytes32 _did, uint256 _amount) public
-```
-
-### mint721
-
-```solidity
-function mint721(bytes32 _did, address _receiver) public
-```
-
-Mints a ERC-721 NFT associated to the DID
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _did | bytes32 | refers to decentralized identifier (a bytes32 length ID). |
-| _receiver | address | the address that will receive the new nfts minted |
-
-### mint721
-
-```solidity
-function mint721(bytes32 _did) public
-```
-
-### burn
-
-```solidity
-function burn(bytes32 _did, uint256 _amount) public
-```
-
-Burns NFTs associated to the DID
-
-_Because ERC-1155 uses uint256 and DID's are bytes32, there is a conversion between both
-     Only the DID owner can burn NFTs associated to the DID_
-
-#### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| _did | bytes32 | refers to decentralized identifier (a bytes32 length ID). |
-| _amount | uint256 | amount to burn |
-
-### burn721
-
-```solidity
-function burn721(bytes32 _did, uint256 _tokenId) public
-```
 
 ### _provenanceStorage
 
@@ -20473,7 +20415,7 @@ struct DIDRegister {
   address owner;
   uint8 royalties;
   bool nftInitialized;
-  bool nft721Initialized;
+  address nftContractAddress;
   address creator;
   bytes32 lastChecksum;
   string url;
@@ -20481,8 +20423,6 @@ struct DIDRegister {
   uint256 blockNumberUpdated;
   address[] providers;
   address[] delegates;
-  uint256 nftSupply;
-  uint256 mintCap;
   address royaltyRecipient;
   contract IRoyaltyScheme royaltyScheme;
   string immutableUrl;
@@ -20522,7 +20462,7 @@ _access modifiers and storage pointer should be implemented in DIDRegistry_
 ### initializeNftConfig
 
 ```solidity
-function initializeNftConfig(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, uint256 _cap, contract IRoyaltyScheme _royaltyHandler) internal
+function initializeNftConfig(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _nftContractAddress, contract IRoyaltyScheme _royaltyHandler) internal
 ```
 
 initializeNftConfig creates the initial setup of NFTs minting and royalties distribution.
@@ -20530,7 +20470,7 @@ After this initial setup, this data can't be changed anymore for the DID given, 
 The reason of this is to avoid minting additional NFTs after the initial agreement, what could affect the 
 valuation of NFTs of a DID already created.
 
-_update the DID registry providers list by adding the mintCap and royalties configuration_
+_update the DID registry providers list by adding the nftContract and royalties configuration_
 
 #### Parameters
 
@@ -20538,13 +20478,13 @@ _update the DID registry providers list by adding the mintCap and royalties conf
 | ---- | ---- | ----------- |
 | _self | struct DIDRegistryLibrary.DIDRegisterList | refers to storage pointer |
 | _did | bytes32 | refers to decentralized identifier (a byte32 length ID) |
-| _cap | uint256 | refers to the mint cap |
+| _nftContractAddress | address |  |
 | _royaltyHandler | contract IRoyaltyScheme | contract for handling royalties |
 
 ### initializeNft721Config
 
 ```solidity
-function initializeNft721Config(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, contract IRoyaltyScheme _royaltyHandler) internal
+function initializeNft721Config(struct DIDRegistryLibrary.DIDRegisterList _self, bytes32 _did, address _nftContractAddress, contract IRoyaltyScheme _royaltyHandler) internal
 ```
 
 ### areRoyaltiesValid
@@ -22738,10 +22678,13 @@ struct RoyaltyInfo {
 }
 ```
 
-### NFTMetadata
+### NFTAttributes
 
 ```solidity
-struct NFTMetadata {
+struct NFTAttributes {
+  bool nftInitialized;
+  uint256 nftSupply;
+  uint256 mintCap;
   string nftURI;
 }
 ```
@@ -22752,10 +22695,10 @@ struct NFTMetadata {
 mapping(uint256 => struct NFTBase.RoyaltyInfo) _royalties
 ```
 
-### _metadata
+### _nftAttributes
 
 ```solidity
-mapping(uint256 => struct NFTBase.NFTMetadata) _metadata
+mapping(uint256 => struct NFTBase.NFTAttributes) _nftAttributes
 ```
 
 ### _expiration
@@ -22782,6 +22725,12 @@ address nvmConfig
 event NFTCloned(address _newAddress, address _fromAddress, uint256 _ercType)
 ```
 
+### onlyOperatorOrOwner
+
+```solidity
+modifier onlyOperatorOrOwner()
+```
+
 ### getNvmConfigAddress
 
 ```solidity
@@ -22802,10 +22751,22 @@ _getNvmConfigAddress get the address of the NeverminedConfig contract_
 function setNvmConfigAddress(address _addr) external
 ```
 
+### _setNFTAttributes
+
+```solidity
+function _setNFTAttributes(uint256 tokenId, uint256 nftSupply, uint256 mintCap, string tokenURI) internal
+```
+
 ### _setNFTMetadata
 
 ```solidity
 function _setNFTMetadata(uint256 tokenId, string tokenURI) internal
+```
+
+### getNFTAttributes
+
+```solidity
+function getNFTAttributes(uint256 tokenId) external view virtual returns (bool nftInitialized, uint256 nftSupply, uint256 mintCap, string nftURI)
 ```
 
 ### _setTokenRoyalty
@@ -22891,22 +22852,22 @@ string name
 string symbol
 ```
 
-### initializeWithName
+### nftRegistry
 
 ```solidity
-function initializeWithName(address owner, string name_, string symbol_, string uri_) public virtual
+contract IExternalRegistry nftRegistry
 ```
 
 ### initialize
 
 ```solidity
-function initialize(string uri_) public
+function initialize(address owner, address didRegistryAddress, string name_, string symbol_, string uri_) public virtual
 ```
 
 ### createClone
 
 ```solidity
-function createClone(string _name, string _symbol, string _uri) external virtual returns (address)
+function createClone(string _name, string _symbol, string _uri, address[] _operators) external virtual returns (address)
 ```
 
 ### isApprovedForAll
@@ -22920,7 +22881,19 @@ _See {IERC1155-isApprovedForAll}._
 ### mint
 
 ```solidity
+function mint(uint256 id, uint256 amount) public
+```
+
+### mint
+
+```solidity
 function mint(address to, uint256 id, uint256 amount, bytes data) public
+```
+
+### burn
+
+```solidity
+function burn(uint256 id, uint256 amount) public
 ```
 
 ### burn
@@ -22934,6 +22907,23 @@ function burn(address to, uint256 id, uint256 amount) public
 ```solidity
 function uri(uint256 tokenId) public view returns (string)
 ```
+
+### setNFTAttributes
+
+```solidity
+function setNFTAttributes(uint256 tokenId, uint256 nftSupply, uint256 mintCap, string nftURI) public
+```
+
+_Record some NFT Metadata_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | the id of the asset with the royalties associated |
+| nftSupply | uint256 | the NFTs supply |
+| mintCap | uint256 | the max number of editions that can be minted |
+| nftURI | string | the URI (https, ipfs, etc) to the metadata describing the NFT |
 
 ### setNFTMetadata
 
@@ -23023,34 +23013,28 @@ _Implementation of the basic standard multi-token._
 uint256 _nftContractCap
 ```
 
+### nftRegistry
+
+```solidity
+contract IExternalRegistry nftRegistry
+```
+
 ### _counterMinted
 
 ```solidity
 struct CountersUpgradeable.Counter _counterMinted
 ```
 
-### initializeWithName
-
-```solidity
-function initializeWithName(string name, string symbol) public virtual
-```
-
-### initializeWithAttributes
-
-```solidity
-function initializeWithAttributes(address owner, string name, string symbol, string uri, uint256 cap) public virtual
-```
-
 ### initialize
 
 ```solidity
-function initialize() public virtual
+function initialize(address owner, address didRegistryAddress, string name, string symbol, string uri, uint256 cap) public virtual
 ```
 
 ### createClone
 
 ```solidity
-function createClone(string name, string symbol, string uri, uint256 cap) external virtual returns (address)
+function createClone(string name, string symbol, string uri, uint256 cap, address[] _operators) external virtual returns (address)
 ```
 
 ### isApprovedForAll
