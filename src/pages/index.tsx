@@ -14,7 +14,7 @@ import tutorialPNGIcon from '@site/static/nevermined/tutorialsDocs.png'
 const b = BEM('nvm', styles)
 
 function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext()
   return (
     <header className={b('banner')}>
       <div className={b('container')}>
