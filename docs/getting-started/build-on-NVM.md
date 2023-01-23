@@ -1,8 +1,10 @@
- 
 ---
-sidebar_position: 4
+sidebar_position: 33
 description: Why we are building nevermined
 ---
+
+# Why we are building nevermined
+
 Nevermined is use-case agnostic. 
 
 We focus on 3 concepts that you can build and deploy use cases on: 
@@ -12,30 +14,30 @@ We focus on 3 concepts that you can build and deploy use cases on:
 
 
 To give you an idea of the broad applicability, projects that have been built on Nevermined include: 
-- [VitaDAO](https://www.vitadao.com/) (IP NFT of scientific research) <br>
-In this case the asset was: the IP of scientific research <br>
+- [VitaDAO](https://www.vitadao.com/) (IP NFT of scientific research) <br />
+In this case the asset was: the IP of scientific research <br />
 Nevermined Functionalities: File-access NFT
 
-- [Invluencer](https://invluencer.com/) (Tokenized access to data reports on start-ups) <br>
-The asset was: a visual asset + login rights to the data reports <br>
+- [Invluencer](https://invluencer.com/) (Tokenized access to data reports on start-ups) <br />
+The asset was: a visual asset + login rights to the data reports <br />
 Nevermined Functionalities: Tokengating NFT
 
-- [Autonomies](https://www.autonomies.io/) (Music NFT marketplace/DAO) <br>
-The asset was: limited edition music tracks <br>
+- [Autonomies](https://www.autonomies.io/) (Music NFT marketplace/DAO) <br />
+The asset was: limited edition music tracks <br />
 Nevermined Functionalities: Royalties, Marketplace Framework
 
-- [Alities](https://alities.io/) (Art NFT marketplace) <br>
-The asset was: visual art <br>
+- [Alities](https://alities.io/) (Art NFT marketplace) <br />
+The asset was: visual art <br />
 Nevermined Functionalities: Marketplace Framework, Royalties, POAPs
 
-- Project X - a P2P Carbon Credit marketplace for a global energy company we can’t talk about just yet  <br>
-The asset was: Carbon Credits <br>
+- Project X - a P2P Carbon Credit marketplace for a global energy company we can’t talk about just yet  <br />
+The asset was: Carbon Credits <br />
 Nevermined Functionalities: Marketplace Framework
 
-- [DeFi data marketplace](https://defi.public.nevermined.network/) <br>
-The asset was: DeFi data sets <br>
+- [DeFi data marketplace](https://defi.public.nevermined.network/) <br />
+The asset was: DeFi data sets <br />
 Nevermined Functionalities: Subscription NFTs, Marketplace Framework
 
-- [Arcadia](https://arcadia.nevermined.rocks/) (AI animation maker) <br>
-The asset was: Text prompts and AI <br> 
+- [Arcadia](https://arcadia.nevermined.rocks/) (AI animation maker) <br />
+The asset was: Text prompts and AI <br />
 Nevermined Functionalities: Royalties, Remote Computation

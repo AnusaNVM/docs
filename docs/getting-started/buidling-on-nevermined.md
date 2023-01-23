@@ -1,8 +1,9 @@
- 
 ---
-sidebar_position: 5
+sidebar_position: 2
 description: Why we are building nevermined
 ---
+
+# Why we are building nevermined
 
 We believe that the killer feature of Web3 is digital assets with embedded conditions and verifiable provenance. This is the atomic unit of value. 
 

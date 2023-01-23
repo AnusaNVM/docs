@@ -1,8 +1,10 @@
- 
 ---
-sidebar_position: 3
-description: Why we are building nevermined
+sidebar_position: 4
+description: Advanced utility for NFTs? What do I get?
 ---
+
+# Advanced utility for NFTs? What do I get?
+
 At the core of Nevermined are a broad range of functionalities that can be used independently or combined to make super powerful products. 
 
 ACCESS FUNCTIONALITIES	
