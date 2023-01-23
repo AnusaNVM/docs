@@ -29,8 +29,8 @@ A way to execute Distributed Computation or Massive Parallel Processing (MPP) us
 _Why use this?_<br />
 These common frameworks are extremely powerful, enabling the processing of exabytes of data on cheap, commodity hardware. In addition, certain frameworks support the training and deployment of AI.<br />
 
-Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br>
-<br>
+Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br />
+<br />
 
 **Compute Utility 3 - ML & AI Model Royalties**<br />
 
@@ -40,5 +40,5 @@ A way to tokenize algorithmic models and add Royalty utility to it.<br />
 _Why use this?_<br />
 This allows data scientists to create new revenue models around their assets.<br />
 
-Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br>
-<br>
+Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br />
+<br />
