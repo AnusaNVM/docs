@@ -17,7 +17,9 @@ The user registering an asset can specify the royalties that are rewarding the o
 
 _Why use this?_<br />
 We have seen many examples where the payout of royalties depends on the goodwill of a marketplace. With this functionality, the royalty conditions are ‘embedded’ in the NFT and will be executed upon.<br />
-<br />
+
+Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br>
+<br>
 
 **Finance Utility 2 - Rewards**<br />
 
@@ -26,7 +28,9 @@ A feature that allows you to use tokens, including your native token, to reward 
 
 _Why use this?_ <br />
 This allows asset producers and content creators to recognize and reward the contributions made by other participants and to stimulate collaborative growth and creation.<br />
-<br />
+
+Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br>
+<br>
 
 **Finance Utility 3 - Dynamic Pricing Framework**<br />
 _What is it?_<br />
@@ -34,7 +38,9 @@ A feature that allows you to define on-chain and off-chain conditions that influ
 
 _Why use this?_<br />
 This allows asset producers to go beyond the one-dimensional pricing strategies. The template comes with a curve model, but the framework allows devs to integrate their own dynamic pricing conditions, e.g. supply/demand, external oracle data,...<br />
-<br />
+
+Discover our [SDK](https://docs.nevermined.io/docs/nevermined-sdk/getting-started) for more.<br>
+<br>
 
 **Finance Utility 4 - Marketplace Framework**<br />
 _What is it?_<br />
@@ -44,7 +50,7 @@ _Why use this?_<br />
 Rather than build a marketplace from scratch, this allows you to manage all the typical metadata required to build a marketplace.<br />
 
 Dig into [Specs](https://docs.nevermined.io/docs/architecture/specs/Spec-MKT/#secondary-market) of the Marketplace API.<br />
-<br />
+<br>
 
 **Finance Utility 5 - NFT Collateralization**<br />
 _What is it?_<br />
