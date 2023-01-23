@@ -1,9 +1,9 @@
 ---
 sidebar_position: 33
-description: Why we are building nevermined
+description: What can you build on Nevermined
 ---
 
-# Why we are building nevermined
+# What can you build on Nevermined
 
 Nevermined is use-case agnostic. 
 

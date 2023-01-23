@@ -9,7 +9,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 const config = {
   title: 'Nevermined Documentation',
   tagline:
-    'Nevermined is an ecosystem development platform. It offers the best of Web3 tech as easy-to-integrate components.',
+    'Utility Unleashed<br /><br />Nevermined provides developer tools and templates to unlock the next level utility behind NFT technology and turn anything and everything into a Web3-ready asset.',
   url: 'https://docs.nevermined.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
