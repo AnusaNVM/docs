@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import '@nevermined-io/styles/lib/esm/styles/globals.scss'
 import clsx from 'clsx'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
@@ -14,13 +14,19 @@ import tutorialPNGIcon from '@site/static/nevermined/tutorialsDocs.png'
 const b = BEM('nvm', styles)
 
 function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext()
+  const { siteConfig } = useDocusaurusContext();
   return (
     <header className={b('banner')}>
       <div className={b('container')}>
         <UiText type="h2" variants={['heading']} className={b('title')}>
           {siteConfig.title}
         </UiText>
+
+        {siteConfig.customFields?.subtitle && (
+          <UiText type="p" variants={['heading']} className={b('subtitle')}>
+            {siteConfig.customFields.subtitle as ReactNode}
+          </UiText>
+        )}
 
         <UiText type="p" className={b('description')}>
           {siteConfig.tagline}
@@ -36,11 +42,7 @@ const FeatureList: BoxItem[] = [
     className: clsx(b('box', ['main'])),
     link: 'docs/getting-started',
     Svg: nvmSVGIcon,
-    description: (
-      <>
-        What is Nevermined? And what can I use it for?
-      </>
-    ),
+    description: <>What is Nevermined? And what can I use it for?</>,
     overlay: <div className={b('box-overlay')} />,
   },
   {
@@ -50,7 +52,8 @@ const FeatureList: BoxItem[] = [
     Svg: integrationDocsSVGIcon,
     description: (
       <>
-        Everything you need to know about using Nevermined via our SDK. For developers who want to use a low-level library.
+        Everything you need to know about using Nevermined via our SDK. For
+        developers who want to use a low-level library.
       </>
     ),
   },
@@ -61,7 +64,8 @@ const FeatureList: BoxItem[] = [
     png: tutorialPNGIcon,
     description: (
       <>
-        Everything you need to know about using Nevermined via our Catalog. For developers who are using React.
+        Everything you need to know about using Nevermined via our Catalog. For
+        developers who are using React.
       </>
     ),
   },
